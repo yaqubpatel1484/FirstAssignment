@@ -1,30 +1,32 @@
 package com.example.firstassignment.posts
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.example.firstassignment.R
 import com.example.firstassignment.data.PostData
-import com.example.firstassignment.network.ApiService
+import com.example.firstassignment.domain.DaggerPostUsecaseComponent
+import com.example.firstassignment.domain.PostUsecase
 import com.example.firstassignment.postdetails.PostDetails
-import com.example.firstassignment.repository.AppRepo
+import javax.inject.Inject
 
-class PostFragment : Fragment(),PostAdapter.OnItemClickListener {
+class PostFragment : Fragment() {
 
     private lateinit var viewModel: PostViewModel
     private lateinit var adapter: PostAdapter
     private var postList = ArrayList<PostData>()
     private lateinit var recyclerView: RecyclerView
+
+    @Inject
+    lateinit var usecase: PostUsecase
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,16 +41,17 @@ class PostFragment : Fragment(),PostAdapter.OnItemClickListener {
 
     private fun initView(rootView: View) {
 
-        val apiService = ApiService.invoke()
-        val appRepo = AppRepo(apiService)
-        val factory = PostViewModelFactory(appRepo)
+
+
+        val usecase = DaggerPostUsecaseComponent.create().getPostUsecase()
+        val factory = PostViewModelFactory(usecase)
         viewModel = ViewModelProvider(this, factory).get(PostViewModel::class.java)
 
         recyclerView = rootView.findViewById(R.id.postFragment_recyclerMovieList)
         val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         recyclerView.layoutManager = layoutManager
         adapter = PostAdapter(context, postList)
-        PostAdapter.onItemClickListener = this
+        PostAdapter.onItemClickListener = MyListener()
         recyclerView.adapter = adapter
 
 
@@ -61,19 +64,24 @@ class PostFragment : Fragment(),PostAdapter.OnItemClickListener {
 
     }
 
-    override fun onClick(model: PostData) {
-        val fragmentManager: FragmentManager = parentFragmentManager
 
-        val bundle = Bundle()
-        bundle.putParcelable("POST", model)
+    inner class MyListener : PostAdapter.OnItemClickListener{
+        override fun onClick(model: PostData) {
+            val fragmentManager: FragmentManager = parentFragmentManager
 
-        val details = PostDetails()
-        details.arguments = bundle
+            val bundle = Bundle()
+            bundle.putParcelable("POST", model)
 
-        fragmentManager.beginTransaction()
-            .replace(R.id.baseActivity_baseContainer, details)
-            .commit()
+            val details = PostDetails()
+            details.arguments = bundle
+
+            fragmentManager.beginTransaction()
+                .replace(R.id.baseActivity_baseContainer, details)
+                .commit()
+        }
     }
+
+
 
 
 }
