@@ -43,9 +43,9 @@ class PostFragment : Fragment() {
 
 
 
-        val usecase = DaggerPostUsecaseComponent.create().getPostUsecase()
-        val factory = PostViewModelFactory(usecase)
-        viewModel = ViewModelProvider(this, factory).get(PostViewModel::class.java)
+
+     //   val factory = PostViewModelFactory(usecase)
+        viewModel = ViewModelProvider(this).get(PostViewModel::class.java)
 
         recyclerView = rootView.findViewById(R.id.postFragment_recyclerMovieList)
         val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
