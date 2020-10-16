@@ -1,11 +1,11 @@
 package com.example.firstassignment.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.firstassignment.R
 import com.example.firstassignment.posts.PostFragment
+import dagger.android.support.DaggerAppCompatActivity
 
-class BaseActivity : AppCompatActivity() {
+class BaseActivity : DaggerAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

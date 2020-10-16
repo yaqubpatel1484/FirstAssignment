@@ -5,28 +5,31 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.firstassignment.R
 import com.example.firstassignment.data.PostData
-import com.example.firstassignment.domain.DaggerPostUsecaseComponent
-import com.example.firstassignment.domain.PostUsecase
 import com.example.firstassignment.postdetails.PostDetails
+import dagger.android.support.DaggerFragment
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
-class PostFragment : Fragment() {
+class PostFragment : DaggerFragment() {
 
-    private lateinit var viewModel: PostViewModel
+   // private lateinit var viewModel: PostViewModel
     private lateinit var adapter: PostAdapter
     private var postList = ArrayList<PostData>()
     private lateinit var recyclerView: RecyclerView
 
+    private val compositeDisposable = CompositeDisposable()
+
     @Inject
-    lateinit var usecase: PostUsecase
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel: PostViewModel by lazy {
+        ViewModelProvider(this,viewModelFactory).get(PostViewModel::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,12 +44,6 @@ class PostFragment : Fragment() {
 
     private fun initView(rootView: View) {
 
-
-
-
-     //   val factory = PostViewModelFactory(usecase)
-        viewModel = ViewModelProvider(this).get(PostViewModel::class.java)
-
         recyclerView = rootView.findViewById(R.id.postFragment_recyclerMovieList)
         val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         recyclerView.layoutManager = layoutManager
@@ -54,18 +51,21 @@ class PostFragment : Fragment() {
         PostAdapter.onItemClickListener = MyListener()
         recyclerView.adapter = adapter
 
-
-        val result = viewModel.getPost()
-        result.observe(viewLifecycleOwner, Observer {
-            Log.e("Size","-"+it.size)
-            postList.addAll(it)
-            adapter.notifyDataSetChanged()
-        })
+        compositeDisposable.add(
+            viewModel.observePost()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    postList.addAll(it)
+                    adapter.notifyDataSetChanged()
+                }, {
+                    Log.e("Error found", "-$it")
+                })
+        )
 
     }
 
 
-    inner class MyListener : PostAdapter.OnItemClickListener{
+    inner class MyListener : PostAdapter.OnItemClickListener {
         override fun onClick(model: PostData) {
             val fragmentManager: FragmentManager = parentFragmentManager
 
@@ -82,6 +82,9 @@ class PostFragment : Fragment() {
     }
 
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.clear()
+    }
 
 }

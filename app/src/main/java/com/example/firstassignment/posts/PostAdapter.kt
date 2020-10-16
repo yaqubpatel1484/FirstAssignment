@@ -19,7 +19,6 @@ class PostAdapter (private val context: Context?, private val list: ArrayList<Po
 
     override fun getItemCount(): Int = list.size
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val view: View = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_view_post, parent, false)
@@ -33,15 +32,12 @@ class PostAdapter (private val context: Context?, private val list: ArrayList<Po
         context?.let {
             holder.setData(context, model)
         }
-
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         var model: PostData? = null
-
         init {
-
             itemView.setOnClickListener(View.OnClickListener {
                 model?.let { model ->
                     onItemClickListener.onClick(model)

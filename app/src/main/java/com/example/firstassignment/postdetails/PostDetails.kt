@@ -30,9 +30,6 @@ class PostDetails : Fragment() {
         arguments?.let {
             model = it.getParcelable("POST")!!
 
-
-            Log.e("TAG", "id-" + model.id)
-
             Glide.with(context!!).load(model.imageUrl).into(rootView.postDetails_ivPoster)
             rootView.postDetails_tvId.text = "${model.id}"
             rootView.postDetails_tvTitle.text = "${model.title}"

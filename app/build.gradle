@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -13,8 +14,12 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        kapt {
+            generateStubs = true
+        }
     }
 
     buildTypes {
@@ -46,8 +51,29 @@ dependencies {
 
     // Dagger
     // https://github.com/google/dagger
-    implementation 'com.google.dagger:dagger:2.24'
-    kapt 'com.google.dagger:dagger-compiler:2.24'
+//    implementation 'com.google.dagger:dagger:2.24'
+//    kapt 'com.google.dagger:dagger-compiler:2.24'
+
+    implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
+
+    implementation "com.google.dagger:dagger:2.24"
+    implementation "com.google.dagger:dagger-android:2.24"
+    implementation "com.google.dagger:dagger-android-support:2.24"
+    kapt "com.google.dagger:dagger-compiler:2.24"
+    kapt "com.google.dagger:dagger-android-processor:2.24"
+    kapt  "com.google.dagger:dagger-android-support:2.24"
+
+//    ext.dagger2_version = '2.24'
+//// Basic Dagger 2 (required)
+//    implementation "com.google.dagger:dagger:$dagger2_version"
+//    kapt "com.google.dagger:dagger-compiler:$dagger2_version"
+//// dagger.android package (optional)
+//    implementation "com.google.dagger:dagger-android:$dagger2_version"
+//    kapt "com.google.dagger:dagger-android-processor:$dagger2_version"
+//// Support library support (optional)
+//    kapt "com.google.dagger:dagger-android-support:$dagger2_version"
+
+
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
 
     // Retrofit
@@ -73,4 +99,6 @@ dependencies {
 
     //Logging
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+
+    implementation 'com.android.support:multidex:1.0.3'
 }
